@@ -1,1 +1,17 @@
-home server OOP.....
+Distributed Virtual Machine Management System
+
+This project aims to create a web-based system for managing virtual machines across multiple physical servers.
+The main goal of the project is to make it easier to view and control virtual machines running on different servers from one place. 
+Through a web interface, users will be able to see which virtual machines are currently running and perform basic actions such as starting,
+stopping, and restarting them.
+
+The project will use object-oriented programming to organize the different parts of the system,
+including the servers, virtual machines, and the tools used to manage them. 
+The two physical servers will communicate with the application
+so that virtual machines on either server can be controlled through the same interface.
+
+Docker will also be used to create a consistent environment 
+for running and testing the project. 
+Automated tests will help make sure the main features work correctly. 
+Overall, this project combines object-oriented programming, networking, virtualization,
+ and Docker into a practical system for managing virtual machines across multiple servers.
