@@ -5,7 +5,7 @@ A web-based application for monitoring and controlling virtual machines across m
 ## Team Members
 
 * Noah Foli
-* Johnathan Beals
+* Jonathan Beals
 
 ## Project Overview
 
@@ -82,6 +82,19 @@ The project uses Docker to provide the development environment.
 
 ```bash
 docker compose up -d
+```
+
+### Open the container
+
+```bash
+docker exec -it oop-final zsh
+```
+
+### Stop the container
+
+```bash
+docker compose down
+```
 
 ## Testing
 
@@ -104,7 +117,7 @@ Mock virtual machines may be used during testing so that the automated tests do 
 
 ## Authors
 
-**Noah Foli**
+**Noah Foli**  
 **Johnathan Beals**
 
 Object-Oriented Programming Final Project
