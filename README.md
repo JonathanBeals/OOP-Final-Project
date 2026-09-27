@@ -74,6 +74,15 @@ Docker will be used to provide a consistent environment for running and testing 
 
 This will help ensure that the application can be run on another computer without requiring the exact same server setup used during development.
 
+## Docker Setup
+
+The project uses Docker to provide the development environment.
+
+### Start the container
+
+```bash
+docker compose up -d
+
 ## Testing
 
 Automated test cases will be created for the main features of the application.
