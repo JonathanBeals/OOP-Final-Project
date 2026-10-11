@@ -318,3 +318,73 @@ button.ghost:hover {
     transform: translateY(0);
   }
 }
+
+.badge.running {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--online);
+}
+
+.badge.stopped {
+  background: rgba(107, 114, 128, 0.2);
+  color: var(--offline);
+}
+
+#vm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#vm-panel {
+  margin-top: 20px;
+}
+
+/* Virtual machine controls */
+#vm-list .button-row {
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+#vm-list button {
+  font-size: 12px;
+  padding: 7px 12px;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Dashboard statistics */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #171a21;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.stat-card strong {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -23,7 +23,7 @@
             <div class="meta">
                 <div class="meta-card">
                     <span class="meta-label">Last Refresh</span>
-                    <span id="last updated">--</span>
+                    <span id="last-updated">--</span>
                 </div>
 
             <button id="refresh" class="ghost" type="button">
@@ -31,6 +31,23 @@
             </button>
             </div>
         </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+            <span class="stat-label">Total Servers</span>
+            <strong id="total-servers">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Running VMs</span>
+            <strong id="running-vms">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Stopped VMs</span>
+            <strong id="stopped-vms">0</strong>
+        </div>
+        </section>
 
         <section class="grid">
             <div class="panel">
@@ -41,6 +58,15 @@
 
             <div id="server-list"></div>
             </div>
+        </section>
+
+        <section class="panel" id="vm-panel">
+            <div class="panel-header">
+                <h2>Virtual Machines</h2>
+                <p>Manage virtual machines across simulated servers.</p>
+            </div>
+
+            <div id="vm-list"></div>
         </section>
 
         </main>
