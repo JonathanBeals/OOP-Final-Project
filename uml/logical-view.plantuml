@@ -16,4 +16,26 @@ class VirtualMachine {
     + host(host: str): None <<setter>>
 }
 
+class Server {
+    - _server_id: int
+    - _name: str
+    - _status: str
+    - _address: str
+    - _virtual_machines: list
+
+    + __init__(server_id: int, name: str, status: str, address: str): None
+    + server_id(): int <<property>>
+    + name(): str <<property>>
+    + name(name: str): None <<setter>>
+    + status(): str <<property>>
+    + status(status: str): None <<setter>>
+    + address(): str <<property>>
+    + address(address: str): None <<setter>>
+    + virtual_machines(): list <<property>>
+    + add_virtual_machine(vm: VirtualMachine): None
+    + remove_virtual_machine(vm_id: int): None
+}
+
+Server "1" o-- "0..*" VirtualMachine : hosts
+
 @enduml

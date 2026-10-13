@@ -1,0 +1,23 @@
+@startuml physical_view
+
+node "User Computer" {
+    artifact "Client"
+}
+
+node "Docker Host" {
+    node "oop-final Container" {
+        artifact "VM Management Application"
+    }
+}
+
+node "Physical Server" {
+    node "Virtual Machine 1"
+    node "Virtual Machine 2"
+}
+
+"Client" --> "VM Management Application" : sends requests
+"VM Management Application" --> "Physical Server" : manages server
+"Physical Server" --> "Virtual Machine 1"
+"Physical Server" --> "Virtual Machine 2"
+
+@enduml

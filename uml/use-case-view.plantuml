@@ -1,0 +1,23 @@
+@startuml use_case_view
+
+left to right direction
+
+actor User
+
+rectangle "VM Management System" {
+    usecase "View Servers" as UC1
+    usecase "View Virtual Machines" as UC2
+    usecase "Add Virtual Machine" as UC3
+    usecase "Remove Virtual Machine" as UC4
+    usecase "Change VM Status" as UC5
+    usecase "Change Server Status" as UC6
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+
+@enduml
