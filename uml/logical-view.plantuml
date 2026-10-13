@@ -1,0 +1,19 @@
+@startuml logical_view
+
+class VirtualMachine {
+    - _vm_id: int
+    - _name: str
+    - _status: str
+    - _host: str
+
+    + __init__(vm_id: int, name: str, status: str, host: str): None
+    + vm_id(): int <<property>>
+    + name(): str <<property>>
+    + name(name: str): None <<setter>>
+    + status(): str <<property>>
+    + status(status: str): None <<setter>>
+    + host(): str <<property>>
+    + host(host: str): None <<setter>>
+}
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml process_view
+
+actor User
+participant "VM Management System" as System
+participant VirtualMachine as VM
+
+User -> System : Start virtual machine
+System -> VM : Check current status
+VM --> System : Return status
+
+alt VM is stopped
+    System -> VM : Set status to running
+    VM --> System : Status updated
+    System --> User : VM started successfully
+else VM is already running
+    System --> User : VM is already running
+end
+
+@enduml

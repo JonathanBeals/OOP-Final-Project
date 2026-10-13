@@ -1,0 +1,18 @@
+@startuml development_view
+
+package "app" {
+    component "virtual_machine.py" as VMFile
+}
+
+package "tests" {
+    component "test_virtual_machine.py" as VMTests
+}
+
+component "Dockerfile" as Docker
+component "Makefile" as Make
+
+VMTests --> VMFile : tests
+Docker --> VMFile : runs application
+Make --> VMTests : runs tests
+
+@enduml
