@@ -14,7 +14,6 @@ services:
       - ${HOME}/.gitconfig:/home/user/.gitconfig
       - ${HOME}/.ssh:/home/user/.ssh
       - ${HOME}/.zsh_history:/home/user/.zsh_history
-      - ${HOME}/.kattisrc:/home/user/.kattisrc
     cap_add:
       - ALL
     privileged: true # Grant full privileges to the container
