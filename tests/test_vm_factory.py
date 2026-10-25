@@ -4,7 +4,7 @@
 from app.vm_factory import VmFactory
 
 
-def test_vm_factory():
+def test_vm_factory() -> None:
     """testing the arguments in the virtual machine
     """
     vm = VmFactory.create_vm(1, "Ubuntu", "stopped", "server 1")
@@ -15,7 +15,7 @@ def test_vm_factory():
     assert vm.host == "server 1"
 
 
-def test_create_multiple_vms():
+def test_create_multiple_vms() -> None:
     """testing the creation of multiple vms
     """
     vm1 = VmFactory.create_vm(1, "Ubuntu", "stopped", "server 1")
@@ -25,7 +25,7 @@ def test_create_multiple_vms():
     assert vm2.name == "Kali Linux"
 
 
-def test_create_running_vm():
+def test_create_running_vm() -> None:
     """testing creation of a running virtual machine
     """
     vm = VmFactory.create_vm(10, "Windows 11", "running", "server 2")
