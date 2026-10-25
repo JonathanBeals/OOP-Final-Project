@@ -10,4 +10,4 @@ lxml
 requests
 pdoc
 kattis-cli
-flask
+Flask
