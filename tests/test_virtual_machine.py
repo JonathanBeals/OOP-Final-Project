@@ -3,7 +3,7 @@
 from app.virtual_machine import VirtualMachine
 
 
-def test_virtual_machine_initialization():
+def test_virtual_machine_initialization() -> None:
     """Test that a VirtualMachine is initialized correctly."""
     vm = VirtualMachine(1, "Ubuntu", "stopped", "server1")
 
@@ -13,7 +13,7 @@ def test_virtual_machine_initialization():
     assert vm.host == "server1"
 
 
-def test_name_setter():
+def test_name_setter() -> None:
     """Test changing the name of a virtual machine."""
     vm = VirtualMachine(1, "Ubuntu", "stopped", "server1")
 
@@ -22,7 +22,7 @@ def test_name_setter():
     assert vm.name == "Ubuntu-Web"
 
 
-def test_status_setter():
+def test_status_setter() -> None:
     """Test changing the status of a virtual machine."""
     vm = VirtualMachine(1, "Ubuntu", "stopped", "server1")
 
@@ -31,7 +31,7 @@ def test_status_setter():
     assert vm.status == "running"
 
 
-def test_host_setter():
+def test_host_setter() -> None:
     """Test changing the host of a virtual machine."""
     vm = VirtualMachine(1, "Ubuntu", "stopped", "server1")
 
