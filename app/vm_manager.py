@@ -25,45 +25,107 @@ class VMManager:
         """Initialize the manager once."""
         if not hasattr(self, "_servers"):
             self._servers: list[Server] = []
+            self._environments: dict[str, list[Server]] = {}
 
     @property
     def servers(self) -> list[Server]:
-        """Return the servers managed by this manager."""
+        """Return the default servers managed by this manager."""
         return self._servers
 
-    def add_server(self, server: Server) -> None:
+    def get_environment_servers(
+        self,
+        environment_id: str
+    ) -> list[Server]:
+        """Return servers belonging to a specific environment.
+
+        Args:
+            environment_id (str): unique environment identifier
+
+        Returns:
+            list[Server]: servers belonging to the environment
+        """
+        if environment_id not in self._environments:
+            self._environments[environment_id] = []
+
+        return self._environments[environment_id]
+
+    def clear_environment(self, environment_id: str) -> None:
+        """Remove one environment and its simulated state.
+
+        Args:
+            environment_id (str): environment to remove
+        """
+        self._environments.pop(environment_id, None)
+
+    def clear_all_environments(self) -> None:
+        """Remove all session environments."""
+        self._environments.clear()
+
+    def add_server(
+        self,
+        server: Server,
+        environment_id: str | None = None
+    ) -> None:
         """Add a server to the manager.
 
         Args:
             server (Server): server to add
+            environment_id (str | None): optional environment identifier
         """
-        self._servers.append(server)
+        if environment_id is None:
+            self._servers.append(server)
+        else:
+            self.get_environment_servers(
+                environment_id
+            ).append(server)
 
-    def get_server(self, server_id: int) -> Server | None:
+    def get_server(
+        self,
+        server_id: int,
+        environment_id: str | None = None
+    ) -> Server | None:
         """Find a server by ID.
 
         Args:
             server_id (int): server ID to search for
+            environment_id (str | None): optional environment identifier
 
         Returns:
             Server | None: matching server or None
         """
-        for server in self._servers:
+        servers = (
+            self._servers
+            if environment_id is None
+            else self.get_environment_servers(environment_id)
+        )
+
+        for server in servers:
             if server.server_id == server_id:
                 return server
 
         return None
 
-    def get_virtual_machine(self, vm_id: int) -> VirtualMachine | None:
-        """Find a virtual machine across all servers.
+    def get_virtual_machine(
+        self,
+        vm_id: int,
+        environment_id: str | None = None
+    ) -> VirtualMachine | None:
+        """Find a virtual machine across servers.
 
         Args:
             vm_id (int): virtual machine ID
+            environment_id (str | None): optional environment identifier
 
         Returns:
             VirtualMachine | None: matching VM or None
         """
-        for server in self._servers:
+        servers = (
+            self._servers
+            if environment_id is None
+            else self.get_environment_servers(environment_id)
+        )
+
+        for server in servers:
             for virtual_machine in server.virtual_machines:
                 if virtual_machine.vm_id == vm_id:
                     return virtual_machine
@@ -76,7 +138,8 @@ class VMManager:
         vm_id: int,
         name: str,
         status: str,
-        host: str
+        host: str,
+        environment_id: str | None = None
     ) -> VirtualMachine | None:
         """Create a VM and add it to a server.
 
@@ -86,11 +149,15 @@ class VMManager:
             name (str): VM name
             status (str): initial VM status
             host (str): VM host name
+            environment_id (str | None): optional environment identifier
 
         Returns:
-            VirtualMachine | None: created VM or None if server is not found
+            VirtualMachine | None: created VM or None
         """
-        server = self.get_server(server_id)
+        server = self.get_server(
+            server_id,
+            environment_id
+        )
 
         if server is None:
             return None
@@ -106,16 +173,24 @@ class VMManager:
 
         return virtual_machine
 
-    def start_vm(self, vm_id: int) -> bool:
+    def start_vm(
+        self,
+        vm_id: int,
+        environment_id: str | None = None
+    ) -> bool:
         """Start a virtual machine.
 
         Args:
             vm_id (int): VM ID
+            environment_id (str | None): optional environment identifier
 
         Returns:
             bool: True if VM was found and started
         """
-        virtual_machine = self.get_virtual_machine(vm_id)
+        virtual_machine = self.get_virtual_machine(
+            vm_id,
+            environment_id
+        )
 
         if virtual_machine is None:
             return False
@@ -124,16 +199,24 @@ class VMManager:
 
         return True
 
-    def stop_vm(self, vm_id: int) -> bool:
+    def stop_vm(
+        self,
+        vm_id: int,
+        environment_id: str | None = None
+    ) -> bool:
         """Stop a virtual machine.
 
         Args:
             vm_id (int): VM ID
+            environment_id (str | None): optional environment identifier
 
         Returns:
             bool: True if VM was found and stopped
         """
-        virtual_machine = self.get_virtual_machine(vm_id)
+        virtual_machine = self.get_virtual_machine(
+            vm_id,
+            environment_id
+        )
 
         if virtual_machine is None:
             return False
@@ -142,16 +225,27 @@ class VMManager:
 
         return True
 
-    def delete_vm(self, vm_id: int) -> bool:
+    def delete_vm(
+        self,
+        vm_id: int,
+        environment_id: str | None = None
+    ) -> bool:
         """Delete a virtual machine.
 
         Args:
             vm_id (int): VM ID
+            environment_id (str | None): optional environment identifier
 
         Returns:
             bool: True if VM was found and removed
         """
-        for server in self._servers:
+        servers = (
+            self._servers
+            if environment_id is None
+            else self.get_environment_servers(environment_id)
+        )
+
+        for server in servers:
             for virtual_machine in server.virtual_machines:
                 if virtual_machine.vm_id == vm_id:
                     server.remove_virtual_machine(vm_id)

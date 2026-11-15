@@ -1,15 +1,20 @@
 """Flask backend API for the VM management system."""
 
-from flask import Flask, Response, jsonify
+from uuid import uuid4
+
+from flask import Flask, Response, jsonify, session
 
 from app.server import Server
 from app.vm_manager import VMManager
+
 
 app = Flask(
     __name__,
     static_folder="../frontend",
     static_url_path=""
 )
+
+app.secret_key = "dev-secret-key"
 
 manager = VMManager()
 
@@ -20,9 +25,19 @@ def dashboard() -> Response:
     return app.send_static_file("index.html")
 
 
-def initialize_demo_data() -> None:
-    """Create sample servers and virtual machines."""
-    if manager.servers:
+def get_environment_id() -> str:
+    """Return the current browser session environment ID."""
+    if "environment_id" not in session:
+        session["environment_id"] = str(uuid4())
+
+    return str(session["environment_id"])
+
+
+def initialize_demo_data(environment_id: str) -> None:
+    """Create sample servers and virtual machines for one session."""
+    servers = manager.get_environment_servers(environment_id)
+
+    if servers:
         return
 
     server_one = Server(
@@ -39,15 +54,23 @@ def initialize_demo_data() -> None:
         "192.168.1.20"
     )
 
-    manager.add_server(server_one)
-    manager.add_server(server_two)
+    manager.add_server(
+        server_one,
+        environment_id
+    )
+
+    manager.add_server(
+        server_two,
+        environment_id
+    )
 
     manager.create_vm(
         1,
         1,
         "Ubuntu-Web",
         "running",
-        "Server1"
+        "Server1",
+        environment_id
     )
 
     manager.create_vm(
@@ -55,7 +78,8 @@ def initialize_demo_data() -> None:
         2,
         "Kali-Linux",
         "stopped",
-        "Server1"
+        "Server1",
+        environment_id
     )
 
     manager.create_vm(
@@ -63,7 +87,8 @@ def initialize_demo_data() -> None:
         3,
         "Windows-11",
         "running",
-        "Server2"
+        "Server2",
+        environment_id
     )
 
     manager.create_vm(
@@ -71,16 +96,20 @@ def initialize_demo_data() -> None:
         4,
         "Debian-Test",
         "stopped",
-        "Server2"
+        "Server2",
+        environment_id
     )
 
 
 @app.get("/api/servers")
 def get_servers() -> tuple[Response, int]:
-    """Return all servers as JSON."""
+    """Return all servers for the current session as JSON."""
+    environment_id = get_environment_id()
+    initialize_demo_data(environment_id)
+
     servers = []
 
-    for server in manager.servers:
+    for server in manager.get_environment_servers(environment_id):
         servers.append(
             {
                 "server_id": server.server_id,
@@ -96,10 +125,13 @@ def get_servers() -> tuple[Response, int]:
 
 @app.get("/api/vms")
 def get_virtual_machines() -> tuple[Response, int]:
-    """Return all virtual machines as JSON."""
+    """Return all virtual machines for the current session as JSON."""
+    environment_id = get_environment_id()
+    initialize_demo_data(environment_id)
+
     virtual_machines = []
 
-    for server in manager.servers:
+    for server in manager.get_environment_servers(environment_id):
         for vm in server.virtual_machines:
             virtual_machines.append(
                 {
@@ -115,8 +147,14 @@ def get_virtual_machines() -> tuple[Response, int]:
 
 @app.post("/api/vms/<int:vm_id>/start")
 def start_virtual_machine(vm_id: int) -> tuple[Response, int]:
-    """Start a virtual machine."""
-    if not manager.start_vm(vm_id):
+    """Start a virtual machine for the current session."""
+    environment_id = get_environment_id()
+    initialize_demo_data(environment_id)
+
+    if not manager.start_vm(
+        vm_id,
+        environment_id
+    ):
         return jsonify({"error": "Virtual machine not found"}), 404
 
     return jsonify(
@@ -130,8 +168,14 @@ def start_virtual_machine(vm_id: int) -> tuple[Response, int]:
 
 @app.post("/api/vms/<int:vm_id>/stop")
 def stop_virtual_machine(vm_id: int) -> tuple[Response, int]:
-    """Stop a virtual machine."""
-    if not manager.stop_vm(vm_id):
+    """Stop a virtual machine for the current session."""
+    environment_id = get_environment_id()
+    initialize_demo_data(environment_id)
+
+    if not manager.stop_vm(
+        vm_id,
+        environment_id
+    ):
         return jsonify({"error": "Virtual machine not found"}), 404
 
     return jsonify(
@@ -145,8 +189,14 @@ def stop_virtual_machine(vm_id: int) -> tuple[Response, int]:
 
 @app.post("/api/vms/<int:vm_id>/restart")
 def restart_virtual_machine(vm_id: int) -> tuple[Response, int]:
-    """Restart a virtual machine."""
-    vm = manager.get_virtual_machine(vm_id)
+    """Restart a virtual machine for the current session."""
+    environment_id = get_environment_id()
+    initialize_demo_data(environment_id)
+
+    vm = manager.get_virtual_machine(
+        vm_id,
+        environment_id
+    )
 
     if vm is None:
         return jsonify({"error": "Virtual machine not found"}), 404
@@ -162,21 +212,6 @@ def restart_virtual_machine(vm_id: int) -> tuple[Response, int]:
         }
     ), 200
 
-
-initialize_demo_data()
-
-manager.create_vm(
-    1, 101, "Ubuntu-Web", "running", "Server1"
-)
-manager.create_vm(
-    1, 102, "Database", "stopped", "Server1"
-)
-manager.create_vm(
-    2, 103, "Kali-Linux", "running", "Server2"
-)
-manager.create_vm(
-    2, 104, "Windows-Server", "stopped", "Server2"
-)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
