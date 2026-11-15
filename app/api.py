@@ -5,13 +5,24 @@ from flask import Flask, Response, jsonify
 from app.server import Server
 from app.vm_manager import VMManager
 
-app = Flask(__name__)
+
+app = Flask(
+    __name__,
+    static_folder="../frontend",
+    static_url_path=""
+)
 
 manager = VMManager()
 
 
+@app.get("/")
+def dashboard() -> Response:
+    """Serve the web dashboard."""
+    return app.send_static_file("index.html")
+
+
 def initialize_demo_data() -> None:
-    """Create sample servers if the manager is empty."""
+    """Create sample servers and virtual machines."""
     if manager.servers:
         return
 
@@ -31,6 +42,38 @@ def initialize_demo_data() -> None:
 
     manager.add_server(server_one)
     manager.add_server(server_two)
+
+    manager.create_vm(
+        1,
+        1,
+        "Ubuntu-Web",
+        "running",
+        "Server1"
+    )
+
+    manager.create_vm(
+        1,
+        2,
+        "Kali-Linux",
+        "stopped",
+        "Server1"
+    )
+
+    manager.create_vm(
+        2,
+        3,
+        "Windows-11",
+        "running",
+        "Server2"
+    )
+
+    manager.create_vm(
+        2,
+        4,
+        "Debian-Test",
+        "stopped",
+        "Server2"
+    )
 
 
 @app.get("/api/servers")
