@@ -1,53 +1,33 @@
 let servers = [];
+let virtualMachines = [];
+
+function showError(message) {
+  console.error(message);
+  alert(message);
+}
 
 async function fetchServers() {
-  try {
-    const response = await fetch("/api/servers");
+  const response = await fetch("/api/servers");
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch servers");
-    }
-
-    const data = await response.json();
-
-    servers = data.map((server) => ({
-      id: server.server_id,
-      name: server.name,
-      status: server.status
-    }));
-
-    renderServers();
-  } catch (error) {
-    console.error("Error fetching servers:", error);
+  if (!response.ok) {
+    throw new Error("Failed to load servers");
   }
+
+  servers = await response.json();
 }
 
 async function fetchVirtualMachines() {
-  try {
-    const response = await fetch("/api/vms");
+  const response = await fetch("/api/vms");
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch virtual machines");
-    }
-
-    const data = await response.json();
-
-    virtualMachines = data.map((vm) => ({
-      id: vm.vm_id,
-      name: vm.name,
-      status: vm.status,
-      host: vm.host
-    }));
-
-    renderVirtualMachines();
-  } catch (error) {
-    console.error("Error fetching virtual machines:", error);
+  if (!response.ok) {
+    throw new Error("Failed to load virtual machines");
   }
+
+  virtualMachines = await response.json();
 }
 
 function renderServers() {
   const serverList = document.getElementById("server-list");
-
   serverList.innerHTML = "";
 
   servers.forEach((server) => {
@@ -61,9 +41,15 @@ function renderServers() {
           ${server.status}
         </span>
       </div>
+
       <div class="meta-row">
         <span>Server ID</span>
-        <span>${server.id}</span>
+        <span>${server.server_id}</span>
+      </div>
+
+      <div class="meta-row">
+        <span>Address</span>
+        <span>${server.address}</span>
       </div>
     `;
 
@@ -71,9 +57,23 @@ function renderServers() {
   });
 }
 
+async function performVmAction(vmId, action) {
+  const response = await fetch(
+    `/api/vms/${vmId}/${action}`,
+    {
+      method: "POST"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to ${action} virtual machine`);
+  }
+
+  await refreshDashboard();
+}
+
 function renderVirtualMachines() {
   const vmList = document.getElementById("vm-list");
-
   vmList.innerHTML = "";
 
   virtualMachines.forEach((vm) => {
@@ -100,62 +100,64 @@ function renderVirtualMachines() {
     card.appendChild(top);
     card.appendChild(host);
 
-    // Create the container for VM controls.
     const controls = document.createElement("div");
     controls.className = "button-row";
 
-    // Create the Start button.
     const startButton = document.createElement("button");
     startButton.textContent = "Start";
     startButton.className = "primary";
     startButton.disabled = vm.status === "running";
 
-    // Create the Stop button.
     const stopButton = document.createElement("button");
     stopButton.textContent = "Stop";
     stopButton.className = "danger";
     stopButton.disabled = vm.status === "stopped";
 
-    // Create the Restart button.
     const restartButton = document.createElement("button");
     restartButton.textContent = "Restart";
     restartButton.className = "ghost";
     restartButton.disabled = vm.status !== "running";
 
-    // Add buttons to the controls container.
+    startButton.addEventListener("click", async () => {
+      startButton.disabled = true;
+
+      try {
+        await performVmAction(vm.vm_id, "start");
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    stopButton.addEventListener("click", async () => {
+      stopButton.disabled = true;
+
+      try {
+        await performVmAction(vm.vm_id, "stop");
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    restartButton.addEventListener("click", async () => {
+      restartButton.disabled = true;
+
+      try {
+        await performVmAction(vm.vm_id, "restart");
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
     controls.appendChild(startButton);
     controls.appendChild(stopButton);
     controls.appendChild(restartButton);
 
-    // Add controls to the VM card.
     card.appendChild(controls);
 
-    startButton.addEventListener("click", () => {
-    vm.status = "running";
-    renderVirtualMachines();
-    });
-
-    stopButton.addEventListener("click", () => {
-    vm.status = "stopped";
-    renderVirtualMachines();
-    });
-
-    restartButton.addEventListener("click", () => {
-    vm.status = "running";
-    renderVirtualMachines();
-    });
-
     vmList.appendChild(card);
-    });
-    updateStatistics();
-}
+  });
 
-async function refreshDashboard() {
-    await fetchServers();
-    await fetchVirtualMachines();
-
-    const lastUpdated = document.getElementById("last-updated");
-    lastUpdated.textContent = new Date().toLocaleTimeString();
+  updateStatistics();
 }
 
 function updateStatistics() {
@@ -177,10 +179,42 @@ function updateStatistics() {
     stoppedVMs;
 }
 
-let virtualMachines = [];
+async function refreshDashboard() {
+  const refreshButton = document.getElementById("refresh");
+
+  if (refreshButton) {
+    refreshButton.disabled = true;
+  }
+
+  try {
+    await Promise.all([
+      fetchServers(),
+      fetchVirtualMachines()
+    ]);
+
+    renderServers();
+    renderVirtualMachines();
+
+    const lastUpdated = document.getElementById("last-updated");
+
+    if (lastUpdated) {
+      lastUpdated.textContent =
+        new Date().toLocaleTimeString();
+    }
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    if (refreshButton) {
+      refreshButton.disabled = false;
+    }
+  }
+}
 
 const refreshButton = document.getElementById("refresh");
 
-refreshButton.addEventListener("click", refreshDashboard);
+refreshButton.addEventListener(
+  "click",
+  refreshDashboard
+);
 
 refreshDashboard();
