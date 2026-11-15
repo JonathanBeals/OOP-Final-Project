@@ -5,7 +5,18 @@ from flask import Flask, Response, jsonify
 from app.server import Server
 from app.vm_manager import VMManager
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="../frontend",
+    static_url_path=""
+)
+
+
+@app.route("/")
+def index():
+    """Serve the frontend dashboard."""
+    return app.send_static_file("index.html")
+
 
 manager = VMManager()
 
@@ -121,6 +132,20 @@ def restart_virtual_machine(vm_id: int) -> tuple[Response, int]:
     ), 200
 
 
+initialize_demo_data()
+
+manager.create_vm(
+    1, 101, "Ubuntu-Web", "running", "Server1"
+)
+manager.create_vm(
+    1, 102, "Database", "stopped", "Server1"
+)
+manager.create_vm(
+    2, 103, "Kali-Linux", "running", "Server2"
+)
+manager.create_vm(
+    2, 104, "Windows-Server", "stopped", "Server2"
+)
+
 if __name__ == "__main__":
-    initialize_demo_data()
     app.run(host="0.0.0.0", port=5000)

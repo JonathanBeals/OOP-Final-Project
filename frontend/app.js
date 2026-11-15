@@ -1,15 +1,49 @@
-const servers = [
-  {
-    id: 1,
-    name: "Server-01",
-    status: "online"
-  },
-  {
-    id: 2,
-    name: "Server-02",
-    status: "online"
+let servers = [];
+
+async function fetchServers() {
+  try {
+    const response = await fetch("/api/servers");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch servers");
+    }
+
+    const data = await response.json();
+
+    servers = data.map((server) => ({
+      id: server.server_id,
+      name: server.name,
+      status: server.status
+    }));
+
+    renderServers();
+  } catch (error) {
+    console.error("Error fetching servers:", error);
   }
-];
+}
+
+async function fetchVirtualMachines() {
+  try {
+    const response = await fetch("/api/vms");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch virtual machines");
+    }
+
+    const data = await response.json();
+
+    virtualMachines = data.map((vm) => ({
+      id: vm.vm_id,
+      name: vm.name,
+      status: vm.status,
+      host: vm.host
+    }));
+
+    renderVirtualMachines();
+  } catch (error) {
+    console.error("Error fetching virtual machines:", error);
+  }
+}
 
 function renderServers() {
   const serverList = document.getElementById("server-list");
@@ -116,13 +150,13 @@ function renderVirtualMachines() {
     updateStatistics();
 }
 
-function refreshDashboard() {
-    renderServers();
-    renderVirtualMachines();
+async function refreshDashboard() {
+    await fetchServers();
+    await fetchVirtualMachines();
 
     const lastUpdated = document.getElementById("last-updated");
     lastUpdated.textContent = new Date().toLocaleTimeString();
-    }
+}
 
 function updateStatistics() {
   const runningVMs = virtualMachines.filter(
@@ -143,32 +177,7 @@ function updateStatistics() {
     stoppedVMs;
 }
 
-const virtualMachines = [
-  {
-    id: 1,
-    name: "Ubuntu-Web",
-    status: "running",
-    host: "Server-01"
-  },
-  {
-    id: 2,
-    name: "Kali-Linux",
-    status: "stopped",
-    host: "Server-01"
-  },
-  {
-    id: 3,
-    name: "Windows-11",
-    status: "running",
-    host: "Server-02"
-  },
-  {
-    id: 4,
-    name: "Debian-Test",
-    status: "stopped",
-    host: "Server-02"
-  }
-];
+let virtualMachines = [];
 
 const refreshButton = document.getElementById("refresh");
 
