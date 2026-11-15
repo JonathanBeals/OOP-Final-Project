@@ -10,7 +10,8 @@ all: fix-style check-style check-types run-test run-test-coverage create-docs cr
 
 .PHONY: check-style
 check-style:
-	flake8 .
+	check-style:
+	flake8 app/ tests/
 
 .PHONY: fix-style
 fix-style:

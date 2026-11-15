@@ -19,6 +19,7 @@ def dashboard() -> Response:
     """Serve the web dashboard."""
     return app.send_static_file("index.html")
 
+
 def initialize_demo_data() -> None:
     """Create sample servers and virtual machines."""
     if manager.servers:
