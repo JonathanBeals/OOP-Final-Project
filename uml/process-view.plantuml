@@ -1,0 +1,22 @@
+@startuml process_view
+
+skinparam shadowing false
+
+actor User
+participant Dashboard
+participant "Flask API" as API
+participant VMManager
+participant VirtualMachine as VM
+
+User -> Dashboard : Click Start
+Dashboard -> API : POST request
+API -> API : Identify session
+API -> VMManager : start_vm(vm_id, session_id)
+VMManager -> VM : Set status to running
+VMManager --> API : Success
+API --> Dashboard : JSON response
+Dashboard -> API : Refresh data
+API --> Dashboard : Updated VM data
+Dashboard --> User : Display status
+
+@enduml

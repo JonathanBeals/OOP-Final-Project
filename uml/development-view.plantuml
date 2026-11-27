@@ -1,0 +1,21 @@
+@startuml development_view
+
+skinparam shadowing false
+
+component "Frontend\nHTML / CSS / JavaScript" as Frontend
+component "Flask API" as API
+component "Backend\nPython Classes" as Backend
+
+component "Testing\npytest / Hypothesis" as Tests
+component "GitHub Actions" as CI
+component "Docker" as Docker
+
+Frontend -right-> API : HTTP / JSON
+API -right-> Backend
+
+Tests -up-> Backend : validates
+Tests ..> API : tests
+CI -right-> Tests : runs
+Docker ..> API : environment
+
+@enduml

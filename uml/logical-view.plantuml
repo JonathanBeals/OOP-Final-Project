@@ -1,0 +1,47 @@
+@startuml logical_view
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class VMManager <<Singleton, Facade>> {
+    - environments: dict
+    + create_vm()
+    + start_vm()
+    + stop_vm()
+    + delete_vm()
+}
+
+class Server {
+    - name: str
+    - virtual_machines: list
+    + add_virtual_machine()
+    + remove_virtual_machine()
+}
+
+class VirtualMachine {
+    - vm_id: int
+    - name: str
+    - status: str
+    - host: str
+}
+
+class VmFactory <<Factory>> {
+    + create_vm()
+}
+
+class VMAdapter <<Adapter>> {
+    + get_virtual_machine()
+}
+
+interface VMProvider {
+    + get_vm_data()
+}
+
+VMManager o-- Server : manages
+Server o-- VirtualMachine : hosts
+VMManager ..> VmFactory : uses
+VmFactory ..> VirtualMachine : creates
+VMAdapter ..> VmFactory : uses
+VMAdapter --> VMProvider : uses
+
+@enduml

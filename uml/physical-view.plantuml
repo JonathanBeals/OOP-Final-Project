@@ -1,0 +1,30 @@
+@startuml physical_view
+
+skinparam shadowing false
+
+node "User Device A" {
+    artifact "Browser A" as A
+}
+
+node "User Device B" {
+    artifact "Browser B" as B
+}
+
+node "Host Server" {
+    node "Docker Container" {
+        component "Flask API" as API
+        component "VMManager" as Manager
+
+        rectangle "Session A\nSimulated VMs" as SessionA
+        rectangle "Session B\nSimulated VMs" as SessionB
+
+        API --> Manager
+        Manager --> SessionA
+        Manager --> SessionB
+    }
+}
+
+A --> API : HTTP
+B --> API : HTTP
+
+@enduml
