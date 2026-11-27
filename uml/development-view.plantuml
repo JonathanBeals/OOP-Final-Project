@@ -1,23 +1,21 @@
 @startuml development_view
 
-package "app" {
-    component "server.py" as ServerFile
-    component "virtual_machine.py" as VMFile
-}
+skinparam shadowing false
 
-package "tests" {
-    component "test_virtual_machine.py" as VMTests
-}
+component "Frontend\nHTML / CSS / JavaScript" as Frontend
+component "Flask API" as API
+component "Backend\nPython Classes" as Backend
 
-component "Dockerfile" as Docker
-component "Makefile" as Make
+component "Testing\npytest / Hypothesis" as Tests
+component "GitHub Actions" as CI
+component "Docker" as Docker
 
-ServerFile --> VMFile : imports
-VMTests --> VMFile : tests
+Frontend -right-> API : HTTP / JSON
+API -right-> Backend
 
-Docker --> ServerFile : runs
-Docker --> VMFile : runs
-
-Make --> VMTests : runs tests
+Tests -up-> Backend : validates
+Tests ..> API : tests
+CI -right-> Tests : runs
+Docker ..> API : environment
 
 @enduml

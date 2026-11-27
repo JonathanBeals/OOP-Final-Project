@@ -1,16 +1,18 @@
 @startuml use_case_view
 
 left to right direction
+skinparam shadowing false
 
 actor User
 
-rectangle "VM Management System" {
+rectangle "Distributed VM Management System" {
+
     usecase "View Servers" as UC1
     usecase "View Virtual Machines" as UC2
-    usecase "Add Virtual Machine" as UC3
-    usecase "Remove Virtual Machine" as UC4
-    usecase "Change VM Status" as UC5
-    usecase "Change Server Status" as UC6
+    usecase "Start VM" as UC3
+    usecase "Stop VM" as UC4
+    usecase "Restart VM" as UC5
+    usecase "Refresh Dashboard" as UC6
 }
 
 User --> UC1

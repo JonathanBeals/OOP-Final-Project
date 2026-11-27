@@ -1,41 +1,47 @@
 @startuml logical_view
 
-class VirtualMachine {
-    - _vm_id: int
-    - _name: str
-    - _status: str
-    - _host: str
+skinparam classAttributeIconSize 0
+skinparam shadowing false
 
-    + __init__(vm_id: int, name: str, status: str, host: str): None
-    + vm_id(): int <<property>>
-    + name(): str <<property>>
-    + name(name: str): None <<setter>>
-    + status(): str <<property>>
-    + status(status: str): None <<setter>>
-    + host(): str <<property>>
-    + host(host: str): None <<setter>>
+class VMManager <<Singleton, Facade>> {
+    - environments: dict
+    + create_vm()
+    + start_vm()
+    + stop_vm()
+    + delete_vm()
 }
 
 class Server {
-    - _server_id: int
-    - _name: str
-    - _status: str
-    - _address: str
-    - _virtual_machines: list
-
-    + __init__(server_id: int, name: str, status: str, address: str): None
-    + server_id(): int <<property>>
-    + name(): str <<property>>
-    + name(name: str): None <<setter>>
-    + status(): str <<property>>
-    + status(status: str): None <<setter>>
-    + address(): str <<property>>
-    + address(address: str): None <<setter>>
-    + virtual_machines(): list <<property>>
-    + add_virtual_machine(vm: VirtualMachine): None
-    + remove_virtual_machine(vm_id: int): None
+    - name: str
+    - virtual_machines: list
+    + add_virtual_machine()
+    + remove_virtual_machine()
 }
 
-Server "1" o-- "0..*" VirtualMachine : hosts
+class VirtualMachine {
+    - vm_id: int
+    - name: str
+    - status: str
+    - host: str
+}
+
+class VmFactory <<Factory>> {
+    + create_vm()
+}
+
+class VMAdapter <<Adapter>> {
+    + get_virtual_machine()
+}
+
+interface VMProvider {
+    + get_vm_data()
+}
+
+VMManager o-- Server : manages
+Server o-- VirtualMachine : hosts
+VMManager ..> VmFactory : uses
+VmFactory ..> VirtualMachine : creates
+VMAdapter ..> VmFactory : uses
+VMAdapter --> VMProvider : uses
 
 @enduml

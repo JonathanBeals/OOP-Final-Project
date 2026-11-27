@@ -1,23 +1,30 @@
 @startuml physical_view
 
-node "User Computer" {
-    artifact "Client"
+skinparam shadowing false
+
+node "User Device A" {
+    artifact "Browser A" as A
 }
 
-node "Docker Host" {
-    node "oop-final Container" {
-        artifact "VM Management Application"
+node "User Device B" {
+    artifact "Browser B" as B
+}
+
+node "Host Server" {
+    node "Docker Container" {
+        component "Flask API" as API
+        component "VMManager" as Manager
+
+        rectangle "Session A\nSimulated VMs" as SessionA
+        rectangle "Session B\nSimulated VMs" as SessionB
+
+        API --> Manager
+        Manager --> SessionA
+        Manager --> SessionB
     }
 }
 
-node "Physical Server" {
-    node "Virtual Machine 1"
-    node "Virtual Machine 2"
-}
-
-"Client" --> "VM Management Application" : sends requests
-"VM Management Application" --> "Physical Server" : manages server
-"Physical Server" --> "Virtual Machine 1"
-"Physical Server" --> "Virtual Machine 2"
+A --> API : HTTP
+B --> API : HTTP
 
 @enduml
