@@ -14,12 +14,12 @@ services:
       - ${HOME}/.gitconfig:/home/user/.gitconfig
       - ${HOME}/.ssh:/home/user/.ssh
       - ${HOME}/.zsh_history:/home/user/.zsh_history
-      - ${HOME}/.kattisrc:/home/user/.kattisrc
     cap_add:
       - ALL
     privileged: true # Grant full privileges to the container
     ports:
       - 8898:8888
+      - "127.0.0.1:5000:5000"
     command: [ "sh", "-c", "sudo chown user --recursive /home/user; zsh && tail -f /dev/null" ]
 
 networks:
